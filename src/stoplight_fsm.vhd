@@ -61,26 +61,26 @@ library ieee;
 
   
 entity stoplight_fsm is
-    Port ( i_C     : in  STD_LOGIC;
+    port ( i_C     : in  STD_LOGIC;
            i_reset : in  STD_LOGIC;
            i_clk   : in  STD_LOGIC;
            o_R     : out  STD_LOGIC;
            o_Y     : out  STD_LOGIC;
            o_G     : out  STD_LOGIC);
-end stoplight_fsm;
+    end stoplight_fsm;
 
 architecture stoplight_fsm_arch of stoplight_fsm is 
 	
 	-- create register signals with default state yellow (10)
-	signal f_Q :std_logic_vector(2 downto 0) := "10";
-	signal f_Q_next :std_logic_vector(2 downto 0) := "10";
+	signal f_Q :std_logic_vector(1 downto 0) := "10";
+	signal f_Q_next :std_logic_vector(1 downto 0) := "10";
   
 begin
 	-- CONCURRENT STATEMENTS ----------------------------
 	-- Next state logic
 	--- state memory w/ asynchronous reset ---
---	f_Q_next(0) = f_Q(1) --
-    
+    f_Q_next(0) <= (not f_Q(1)) and i_C;
+    f_Q_next(1) <= (not f_Q(1)) and f_Q(0) and (not i_C);
 	
 
     
@@ -90,6 +90,9 @@ begin
 	
 	
 	-- Output logic
+    o_G <= (not f_Q(1)) and f_Q(0);
+    o_Y <= f_Q(1) and (not f_Q(0));
+    o_R <= ((not f_Q(1)) and (not f_Q(0))) or (f_Q(1) and f_Q(0));
 	
 	-------------------------------------------------------	
 	
